@@ -2,3 +2,4 @@
 
 Enter - spin
 
+.exe file in builds/ folder
