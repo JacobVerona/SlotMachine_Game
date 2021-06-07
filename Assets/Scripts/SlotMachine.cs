@@ -6,6 +6,19 @@ using UnityEngine;
 
 public class SlotMachine : MonoBehaviour
 {
+    private static readonly SlotElement[,,] combinations = new SlotElement[,,]
+    {
+        { {SlotElement.Ammo }, { SlotElement.Ammo }, { SlotElement.Ammo } },
+        { {SlotElement.Bomb }, { SlotElement.Bomb }, { SlotElement.Bomb } },
+        { {SlotElement.Fist }, { SlotElement.Fist }, { SlotElement.Fist } },
+        { {SlotElement.Knife }, { SlotElement.Knife }, { SlotElement.Knife } },
+    };
+
+    private static readonly int[] winList = new int[]
+    {
+        200, 200, 200, 200
+    };
+
     public Drum[] drums = new Drum[3];
     public Animation animator;
     public AudioSource audior;
@@ -27,7 +40,14 @@ public class SlotMachine : MonoBehaviour
         set
         {
             score = value;
-            textScore.text = $"Score: {score}, Win/Lose: {wins}/{loses}, Spins: {wins+loses}" ;
+            if (score < 0)
+            {
+                textScore.text = $"Debt: {-score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+            }
+            else
+            {
+                textScore.text = $"Score: {score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+            }
         }
     }
     
@@ -44,10 +64,8 @@ public class SlotMachine : MonoBehaviour
     {
         if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) && !isStarted)
         {
-            if (score >= 10)
-            {
-                Score -= 10;
-            }
+            Score -= 10;
+            
 
             int multiply = 1;
             foreach (var drum in drums)
@@ -86,32 +104,19 @@ public class SlotMachine : MonoBehaviour
             text[i].text = drums[i].CurrentElement.ToString();
         }
 
-        if ((slotsCombination[0] == slotsCombination[1]) && slotsCombination[1] == slotsCombination[2])
+        for (int i = 0; i < combinations.GetLength(0); i++)
         {
-            textStatus.text = "<color=green>You win";
-            wins++;
-            audioWin.Play();
-            switch (slotsCombination[0])
+            if (slotsCombination[0] == combinations[i, 0, 0] && slotsCombination[1] == combinations[i, 1, 0] && slotsCombination[2] == combinations[i, 2, 0])
             {
-                case SlotElement.Fist:
-                    Score += 100;
-                    break;
-                case SlotElement.Ammo:
-                    Score += 20;
-                    break;
-                case SlotElement.Bomb:
-                    Score += 40;
-                    break;
-                case SlotElement.Knife:
-                    Score += 80;
-                    break;
+                textStatus.text = "<color=green>You win";
+                wins++;
+                audioWin.Play();
+                Score += winList[i];
+                return;
             }
         }
-        else
-        {
-            loses++;
-            textStatus.text = "<color=red>You lose";
-            textScore.text = $"Score: {score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
-        }
+        loses++;
+        textStatus.text = "<color=red>You lose";
+        Score += 0;
     }
 }
