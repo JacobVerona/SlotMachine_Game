@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class SlotMachine : MonoBehaviour
 {
-    private static readonly SlotElement[,,] combinations = new SlotElement[,,]
+    private static readonly SlotElement[,,] Combinations = new SlotElement[,,]
     {
         { {SlotElement.Ammo }, { SlotElement.Ammo }, { SlotElement.Ammo } },
         { {SlotElement.Bomb }, { SlotElement.Bomb }, { SlotElement.Bomb } },
@@ -14,7 +14,7 @@ public class SlotMachine : MonoBehaviour
         { {SlotElement.Knife }, { SlotElement.Knife }, { SlotElement.Knife } },
     };
 
-    private static readonly int[] winList = new int[]
+    private static readonly int[] WinList = new int[]
     {
         200, 200, 200, 200
     };
@@ -30,8 +30,8 @@ public class SlotMachine : MonoBehaviour
     [SerializeField] private bool _isStarted;
 
     private int _score = 100;
-    private int wins;
-    private int loses;
+    private int _wins;
+    private int _loses;
 
     public AudioSource Audior { get => _audior; }
 
@@ -43,18 +43,18 @@ public class SlotMachine : MonoBehaviour
             _score = value;
             if (_score < 0)
             {
-                _textScore.text = $"Debt: {-_score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+                _textScore.text = $"Debt: {-_score}, Win/Lose: {_wins}/{_loses}, Spins: {_wins + _loses}";
             }
             else
             {
-                _textScore.text = $"Score: {_score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+                _textScore.text = $"Score: {_score}, Win/Lose: {_wins}/{_loses}, Spins: {_wins + _loses}";
             }
         }
     }
     
     public void OnEnable ()
     {
-        _textScore.text = $"Score: {_score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+        _textScore.text = $"Score: {_score}, Win/Lose: {_wins}/{_loses}, Spins: {_wins + _loses}";
         foreach (var drum in _drums)
         {
             drum.Finished += OnDrumFinished;
@@ -105,18 +105,18 @@ public class SlotMachine : MonoBehaviour
             _text[i].text = _drums[i].CurrentElement.ToString();
         }
 
-        for (int i = 0; i < combinations.GetLength(0); i++)
+        for (int i = 0; i < Combinations.GetLength(0); i++)
         {
-            if (slotsCombination[0] == combinations[i, 0, 0] && slotsCombination[1] == combinations[i, 1, 0] && slotsCombination[2] == combinations[i, 2, 0])
+            if (slotsCombination[0] == Combinations[i, 0, 0] && slotsCombination[1] == Combinations[i, 1, 0] && slotsCombination[2] == Combinations[i, 2, 0])
             {
                 _textStatus.text = "<color=green>You win";
-                wins++;
+                _wins++;
                 _audioWin.Play();
-                Score += winList[i];
+                Score += WinList[i];
                 return;
             }
         }
-        loses++;
+        _loses++;
         _textStatus.text = "<color=red>You lose";
         Score += 0;
     }
