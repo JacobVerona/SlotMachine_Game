@@ -19,104 +19,105 @@ public class SlotMachine : MonoBehaviour
         200, 200, 200, 200
     };
 
-    public Drum[] drums = new Drum[3];
-    public Animation animator;
-    public AudioSource audior;
-    public AudioSource audioWin;
-    public TMP_Text[] text = new TMP_Text[3];
-    public TMP_Text textScore;
-    public TMP_Text textStatus;
+    [SerializeField] private Drum[] _drums = new Drum[3];
+    [SerializeField] private Animation _animator;
+    [SerializeField] private AudioSource _audior;
+    [SerializeField] private AudioSource _audioWin;
+    [SerializeField] private TMP_Text[] _text = new TMP_Text[3];
+    [SerializeField] private TMP_Text _textScore;
+    [SerializeField] private TMP_Text _textStatus;
 
-    [SerializeField] private bool isStarted;
+    [SerializeField] private bool _isStarted;
 
-    public int score = 100;
-
+    private int _score = 100;
     private int wins;
     private int loses;
 
+    public AudioSource Audior { get => _audior; }
+
     public int Score
     {
-        get => score;
+        get => _score;
         set
         {
-            score = value;
-            if (score < 0)
+            _score = value;
+            if (_score < 0)
             {
-                textScore.text = $"Debt: {-score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+                _textScore.text = $"Debt: {-_score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
             }
             else
             {
-                textScore.text = $"Score: {score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+                _textScore.text = $"Score: {_score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
             }
         }
     }
     
     public void OnEnable ()
     {
-        textScore.text = $"Score: {score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
-        foreach (var drum in drums)
+        _textScore.text = $"Score: {_score}, Win/Lose: {wins}/{loses}, Spins: {wins + loses}";
+        foreach (var drum in _drums)
         {
-            drum.finishedCallback += OnDrumFinished;
+            drum.Finished += OnDrumFinished;
         }
     }
 
     public void FixedUpdate ()
     {
-        if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) && !isStarted)
+        if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) && !_isStarted)
         {
             Score -= 10;
             
 
             int multiply = 1;
-            foreach (var drum in drums)
+            foreach (var drum in _drums)
             {
-                audior.Play();
-                animator.Play();
+                _audior.Play();
+                _animator.Play();
                 drum.StartRotation(UnityEngine.Random.Range(50f,100f) * ++multiply);
-                isStarted = true;
+                _isStarted = true;
             }
         }
-        foreach (var drum in drums)
+        foreach (var drum in _drums)
         {
             drum.Rotate();
-            for (int i = 0; i < drums.Length; i++)
+            for (int i = 0; i < _drums.Length; i++)
             {
-                text[i].text = drums[i].CurrentElement.ToString();
+                _text[i].text = _drums[i].CurrentElement.ToString();
             }
         }
     }
 
     public void OnDrumFinished (Drum drum)
     {
-        for (int i = 0; i < drums.Length; i++)
+        for (int i = 0; i < _drums.Length; i++)
         {
-            if (!drums[i].IsFinished)
+            if (!_drums[i].IsFinished)
             {
                 return;
             }
         }
 
-        isStarted = false;
-        SlotElement[] slotsCombination = new SlotElement[drums.Length];
-        for (int i = 0; i < drums.Length; i++)
+        _isStarted = false;
+        SlotElement[] slotsCombination = new SlotElement[_drums.Length];
+        for (int i = 0; i < _drums.Length; i++)
         {
-            slotsCombination[i] = drums[i].CurrentElement;
-            text[i].text = drums[i].CurrentElement.ToString();
+            slotsCombination[i] = _drums[i].CurrentElement;
+            _text[i].text = _drums[i].CurrentElement.ToString();
         }
 
         for (int i = 0; i < combinations.GetLength(0); i++)
         {
             if (slotsCombination[0] == combinations[i, 0, 0] && slotsCombination[1] == combinations[i, 1, 0] && slotsCombination[2] == combinations[i, 2, 0])
             {
-                textStatus.text = "<color=green>You win";
+                _textStatus.text = "<color=green>You win";
                 wins++;
-                audioWin.Play();
+                _audioWin.Play();
                 Score += winList[i];
                 return;
             }
         }
         loses++;
-        textStatus.text = "<color=red>You lose";
+        _textStatus.text = "<color=red>You lose";
         Score += 0;
     }
 }

@@ -14,7 +14,7 @@ public class MainMenu : MonoBehaviour
 
     public void OnStart ()
     {
-        slotMachine.audior.outputAudioMixerGroup.audioMixer.SetFloat("Volume", 0);
+        slotMachine.Audior.outputAudioMixerGroup.audioMixer.SetFloat("Volume", 0);
         mainMenu.SetActive(false);
         Time.timeScale = 1;
     }
@@ -34,7 +34,7 @@ public class MainMenu : MonoBehaviour
 
     private void Pause ()
     {
-        slotMachine.audior.outputAudioMixerGroup.audioMixer.SetFloat("Volume", -60f);
+        slotMachine.Audior.outputAudioMixerGroup.audioMixer.SetFloat("Volume", -60f);
         mainMenu.SetActive(true);
         Time.timeScale = 0;
     }

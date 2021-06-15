@@ -4,48 +4,47 @@ using UnityEngine;
 [System.Serializable]
 public class Drum : MonoBehaviour
 {
-    private float rotationVelocity;
-    public SlotElement currentElement;
+    [SerializeField] private Animator _animator;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip[] _sounds;
 
-    public AudioClip[] sounds = new AudioClip[0];
+    public event Action<Drum> Finished;
 
-    [SerializeField]private Animator animator;
-    [SerializeField]private AudioSource audioSource;
+    private float _rotationVelocity;
+    private SlotElement _currentElement;
 
-    public Action<Drum> finishedCallback;
-
-    private bool needStop;
+    private bool _needStop;
     public bool IsFinished { get; private set; }
     public SlotElement CurrentElement
     {
-        get => currentElement;
-        set => currentElement = value;
+        get => _currentElement;
+        set => _currentElement = value;
     }
 
 
     private void OnEnable ()
     {
-        animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
-        currentElement = SlotElement.Fist;
-        animator.speed = 0;
-        needStop = false;
+        _animator = GetComponent<Animator>();
+        _audioSource = GetComponent<AudioSource>();
+        _currentElement = SlotElement.Fist;
+        _animator.speed = 0;
+        _needStop = false;
         IsFinished = true;
     }
 
     public void StartRotation (float velocity)
     {
         IsFinished = false;
-        rotationVelocity = velocity;
-        animator.speed = rotationVelocity;
+        _rotationVelocity = velocity;
+        _animator.speed = _rotationVelocity;
     }
 
     public void StopRotation ()
     {
-        animator.speed = 0;
-        rotationVelocity = 0f;
+        _animator.speed = 0;
+        _rotationVelocity = 0f;
         IsFinished = true;
-        finishedCallback?.Invoke(this);
+        Finished?.Invoke(this);
     }
 
     public void Rotate ()
@@ -55,30 +54,32 @@ public class Drum : MonoBehaviour
             return;
         }
 
-        rotationVelocity = Mathf.LerpUnclamped(rotationVelocity, 0, Time.deltaTime);
-        animator.speed = rotationVelocity;
+        _rotationVelocity = Mathf.LerpUnclamped(_rotationVelocity, 0, Time.deltaTime);
+        _animator.speed = _rotationVelocity;
 
-        if (rotationVelocity < 0.4f)
+        if (_rotationVelocity < 0.4f)
         {
-            needStop = true;
+            _needStop = true;
         }
     }
 
-
+    //Animation event
     public void SetElementType (SlotElement slotElement)
     {
-        if (!audioSource.isPlaying)
+        if (!_audioSource.isPlaying)
         {
-            audioSource.Play();
+            _audioSource.Play();
         }
         CurrentElement = slotElement;
     }
 
+
+    //Animation event
     public void OnStopElement ()
     {
-        if (needStop)
+        if (_needStop)
         {
-            needStop = false;
+            _needStop = false;
             StopRotation();
         }
     }
